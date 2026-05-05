@@ -3,4 +3,4 @@
 *.pyc
 __pycache__/
 storage/vector_db/
-storage/reports/governance_report_*.json
+storage/reports/governance-reports/
