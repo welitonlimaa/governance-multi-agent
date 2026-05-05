@@ -163,7 +163,7 @@ CLOUD_GCP_MODE=mock          # "mock" (padrão) | "real" (requer google-cloud SD
 CLOUD_AZURE_MODE=mock        # "mock" (padrão) | "real" (requer azure-mgmt SDKs)
 
 # ─── Input/Output ─────────────────────────────────────────────────────────────
-INPUT_FILE=mock_data_multi_agent_governanca.md
+INPUT_FILE=cultura.md
 STORAGE_PATH=./storage/reports
 VECTOR_DB_PATH=./storage/vector_db
 
@@ -189,7 +189,7 @@ python main.py
 # Arquivo personalizado
 python main.py --file /caminho/para/meus_dados.md
 
-# Execution ID customizado (útil para rastreamento)
+# Execution ID customizado
 python main.py --execution-id minha-execucao-001
 ```
 
@@ -210,6 +210,9 @@ LOG_LEVEL=DEBUG python main.py
 
 # Tudo real
 CLOUD_AWS_MODE=real CLOUD_GCP_MODE=real CLOUD_AZURE_MODE=real python main.py
+
+# ORQUESTRADOR
+ORCHESTRATOR=langgraph
 ```
 
 ### Saída esperada no console
@@ -594,6 +597,17 @@ OPENAI_API_KEY=sk-... python main.py
 ```bash
 CLOUD_AWS_MODE=real OPENAI_API_KEY=sk-... python main.py
 ```
+
+### Orquestrador Step Functions
+
+```bash
+ORCHESTRATOR=step_functions python main.py
+```
+
+```bash
+python main.py --orchestrator step_functions
+```
+
 
 ### Teste de resiliência (30% de falha nos providers)
 
