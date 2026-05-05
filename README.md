@@ -24,19 +24,11 @@ Sistema local que simula uma arquitetura serverless multi-agent para governança
 
 ## Visão Geral
 
-O sistema processa dados (mocks ou reais) estruturados de recursos cloud e documentos organizacionais, executa um pipeline de agentes especializados em paralelo e gera um relatório executivo consolidado com insights e ações priorizadas.
+O sistema processa dados estruturados de recursos cloud e documentos organizacionais, executa um pipeline de agentes especializados em paralelo e gera um relatório executivo consolidado com insights e ações priorizadas.
 
-```
-                    Cloud Providers (mock/real)
-                               ↓
-                          PlannerAgent
-                               ↓ (paralelo)
-             FinOpsAgent  DataGovernanceAgent  CulturaAgent
-                               ↓
-                          AnalyzerAgent -> OpenAI (narrativa)
-                               ↓
-                    Relatório JSON + Console
-```
+## Arquitetura
+
+![](arq.png)
 
 **O que cada camada faz:**
 
@@ -52,32 +44,6 @@ O sistema processa dados (mocks ou reais) estruturados de recursos cloud e docum
 
 ---
 
-## Arquitetura
-
-### Fluxo LangGraph
-
-```
-                    ┌─────────────┐
-                    │   Planner   │  Decide quais agentes executar
-                    └──────┬──────┘
-                           │ roteamento condicional
-          ┌────────────────┼────────────────┐
-          ▼                ▼                ▼
-    ┌──────────┐   ┌──────────────┐  ┌───────────┐
-    │  FinOps  │   │ DataGov LGPD │  │  Cultura  │
-    │  Agent   │   │    Agent     │  │   Agent   │
-    └────┬─────┘   └──────┬───────┘  └─────┬─────┘
-         │                │                │
-         └────────────────┴────────────────┘
-                          │ convergência
-                    ┌─────▼──────┐
-                    │  Analyzer  │  Correlaciona e chama LLM
-                    └─────┬──────┘
-                          │
-                    ┌─────▼──────┐
-                    │  Relatório │  JSON (S3 local) + console
-                    └────────────┘
-```
 
 ### Simulações Locais de Serviços AWS
 
