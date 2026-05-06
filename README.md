@@ -4,6 +4,8 @@ Sistema local que simula uma arquitetura serverless multi-agent para governança
 
 ---
 
+![](dashboard.png)
+
 ## Sumário
 
 - [Visão Geral](#visão-geral)
