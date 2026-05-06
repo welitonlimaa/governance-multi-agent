@@ -1,0 +1,845 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>Governance Intelligence Hub</title>
+<link rel="preconnect" href="https://fonts.googleapis.com"/>
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin/>
+<link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=DM+Mono:wght@300;400;500&family=Instrument+Sans:ital,wght@0,400;0,500;0,600;1,400&display=swap" rel="stylesheet"/>
+<style>
+/* ── RESET & BASE ─────────────────────────────────────────────────────────── */
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+:root{
+  --ink:       #0a0a0f;
+  --ink2:      #1a1a2e;
+  --surface:   #f0efe8;
+  --panel:     #faf9f3;
+  --border:    #e2e0d4;
+  --accent:    #e8461a;
+  --accent2:   #1a46e8;
+  --gold:      #c9a84c;
+  --ok:        #1a8c4e;
+  --warn:      #d97706;
+  --crit:      #dc2626;
+  --high:      #e85c1a;
+  --med:       #d97706;
+  --low:       #1a8c4e;
+  --mono:      'DM Mono', monospace;
+  --head:      'Arial', sans-serif;
+  --body:      'Instrument Sans', sans-serif;
+  --r:         4px;
+  --r2:        8px;
+  --shadow:    0 1px 3px rgba(0,0,0,.08), 0 4px 16px rgba(0,0,0,.06);
+}
+
+html{scroll-behavior:smooth}
+body{
+  background:var(--surface);
+  color:var(--ink);
+  font-family:var(--body);
+  font-size:14px;
+  line-height:1.6;
+  min-height:100vh;
+  overflow-x:hidden;
+}
+
+/* ── LAYOUT ──────────────────────────────────────────────────────────────── */
+.app{display:grid;grid-template-rows:auto 1fr;min-height:100vh}
+
+/* ── HEADER ──────────────────────────────────────────────────────────────── */
+header{
+  background:var(--ink);
+  color:#fff;
+  padding:0 40px;
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  height:64px;
+  position:sticky;top:0;z-index:100;
+  border-bottom:2px solid var(--accent);
+}
+.logo{
+  font-family:var(--head);
+  font-weight:800;
+  font-size:17px;
+  letter-spacing:-.3px;
+  display:flex;align-items:center;gap:10px;
+}
+.logo-mark{
+  width:28px;height:28px;
+  background:var(--accent);
+  border-radius:3px;
+  display:grid;place-items:center;
+}
+.logo-mark svg{width:16px;height:16px;fill:#fff}
+.header-meta{
+  display:flex;align-items:center;gap:24px;
+  font-family:var(--mono);font-size:11px;color:rgba(255,255,255,.5);
+}
+.header-badge{
+  background:rgba(255,255,255,.08);
+  border:1px solid rgba(255,255,255,.12);
+  padding:4px 10px;border-radius:3px;
+  font-size:11px;color:rgba(255,255,255,.7);
+}
+.header-badge.live{border-color:var(--ok);color:#5de68a}
+.exec-id{font-family:var(--mono);font-size:10px;color:rgba(255,255,255,.35)}
+
+/* ── MAIN GRID ───────────────────────────────────────────────────────────── */
+main{padding:32px 40px 64px;max-width:1440px;margin:0 auto;width:100%}
+
+/* ── SECTION HEADERS ─────────────────────────────────────────────────────── */
+.section-label{
+  font-family:var(--mono);font-size:10px;letter-spacing:2px;
+  text-transform:uppercase;color:rgb(0, 0, 0); 
+  margin-bottom:12px;display:flex;align-items:center;gap:8px;
+}
+.section-label::after{content:'';flex:1;height:1px;background:var(--border)}
+
+/* ── HERO ROW ────────────────────────────────────────────────────────────── */
+.hero-row{
+  display:grid;
+  grid-template-columns:1fr 1fr 1fr 320px;
+  gap:16px;
+  margin-bottom:32px;
+}
+
+/* ── KPI CARD ────────────────────────────────────────────────────────────── */
+.kpi{
+  background:var(--panel);
+  border:1px solid var(--border);
+  border-radius:var(--r2);
+  padding:24px;
+  position:relative;
+  overflow:hidden;
+  box-shadow:var(--shadow);
+  animation:fadeUp .4s ease both;
+}
+.kpi::before{
+  content:'';position:absolute;
+  top:0;left:0;right:0;height:3px;
+  background:var(--accent);
+}
+.kpi.ok::before{background:var(--ok)}
+.kpi.warn::before{background:var(--warn)}
+.kpi.crit::before{background:var(--crit)}
+.kpi.accent2::before{background:var(--accent2)}
+
+.kpi-label{
+  font-family:var(--mono);font-size:10px;letter-spacing:1.5px;
+  text-transform:uppercase;color:rgb(49, 49, 49);margin-bottom:10px;
+}
+.kpi-value{
+  font-family:var(--head);font-size:36px;font-weight:800;
+  line-height:1;color:var(--ink);
+}
+.kpi-value sup{font-size:18px;vertical-align:top;margin-top:4px;color:rgba(0,0,0,.4)}
+.kpi-sub{margin-top:8px;font-size:12px;color:rgba(0,0,0,.45)}
+.kpi-sub strong{color:var(--ink);font-weight:600}
+
+/* ── RISK GAUGE ──────────────────────────────────────────────────────────── */
+.risk-card{
+  background:var(--ink2);
+  border-radius:var(--r2);
+  padding:24px;
+  display:flex;flex-direction:column;align-items:center;justify-content:center;
+  color:#fff;
+  box-shadow:var(--shadow);
+  animation:fadeUp .4s .1s ease both;
+}
+.risk-label{
+  font-family:var(--mono);font-size:10px;letter-spacing:1.5px;
+  text-transform:uppercase;color:rgba(255,255,255,.4);
+  margin-bottom:16px;
+}
+.gauge-wrap{position:relative;width:140px;height:75px;margin:0 auto 16px}
+.gauge-wrap svg{width:140px;height:75px;overflow:visible}
+.gauge-track{fill:none;stroke:rgba(255,255,255,.08);stroke-width:14;stroke-linecap:round}
+.gauge-fill{fill:none;stroke-width:14;stroke-linecap:round;transition:stroke-dashoffset .8s cubic-bezier(.4,0,.2,1)}
+.gauge-score{
+  position:absolute;
+  bottom:-4px;left:50%;transform:translateX(-50%);
+  font-family:var(--head);font-size:32px;font-weight:800;color:#fff;
+  line-height:1;
+}
+.gauge-max{font-size:13px;color:rgba(255,255,255,.4)}
+.risk-desc{font-size:12px;color:rgba(255,255,255,.5);text-align:center}
+
+/* ── CONTENT GRID ────────────────────────────────────────────────────────── */
+.content-grid{
+  display:grid;
+  grid-template-columns:1fr 1fr;
+  gap:16px;
+  margin-bottom:32px;
+}
+.content-grid.three{grid-template-columns:1fr 1fr 1fr}
+.content-grid.one{grid-template-columns:1fr}
+
+/* ── PANEL ───────────────────────────────────────────────────────────────── */
+.panel{
+  background:var(--panel);
+  border:1px solid var(--border);
+  border-radius:var(--r2);
+  padding:24px;
+  box-shadow:var(--shadow);
+  animation:fadeUp .4s ease both;
+}
+.panel-title{
+  font-family:var(--head);font-size:15px;font-weight:700;
+  margin-bottom:20px;display:flex;align-items:center;gap:8px;
+}
+.panel-title .dot{
+  width:8px;height:8px;border-radius:50%;
+  background:var(--accent);flex-shrink:0;
+}
+.panel-title .dot.ok{background:var(--ok)}
+.panel-title .dot.warn{background:var(--warn)}
+.panel-title .dot.crit{background:var(--crit)}
+.panel-title .dot.accent2{background:var(--accent2)}
+.panel-title .dot.gold{background:var(--gold)}
+
+/* ── BAR CHART ───────────────────────────────────────────────────────────── */
+.bar-chart{display:flex;flex-direction:column;gap:10px}
+.bar-row{display:grid;grid-template-columns:100px 1fr 70px;align-items:center;gap:12px}
+.bar-name{font-size:12px;color:rgba(0,0,0,.6);text-align:right;font-family:var(--mono)}
+.bar-track{height:8px;background:rgba(0,0,0,.06);border-radius:4px;overflow:hidden}
+.bar-fill{height:100%;border-radius:4px;transition:width .8s cubic-bezier(.4,0,.2,1)}
+.bar-fill.aws{background:linear-gradient(90deg,#e8521a,#e8821a)}
+.bar-fill.gcp{background:linear-gradient(90deg,#1a46e8,#1a86e8)}
+.bar-fill.azure{background:linear-gradient(90deg,#1a8ce8,#1ae8d4)}
+.bar-fill.compute{background:linear-gradient(90deg,#8b1ae8,#c41ae8)}
+.bar-fill.storage{background:linear-gradient(90deg,#e8461a,#e8961a)}
+.bar-fill.database{background:linear-gradient(90deg,#1a8c4e,#1ae87a)}
+.bar-val{font-family:var(--mono);font-size:12px;font-weight:500;color:var(--ink)}
+
+/* ── DONUT ───────────────────────────────────────────────────────────────── */
+.donut-wrap{display:flex;align-items:center;gap:24px}
+.donut-svg{flex-shrink:0}
+.donut-legend{display:flex;flex-direction:column;gap:8px}
+.legend-item{display:flex;align-items:center;gap:8px;font-size:12px}
+.legend-dot{width:10px;height:10px;border-radius:2px;flex-shrink:0}
+.legend-label{color:rgba(0,0,0,.6)}
+.legend-val{font-family:var(--mono);font-weight:500;margin-left:auto}
+
+/* ── FINDINGS TABLE ──────────────────────────────────────────────────────── */
+.findings{display:flex;flex-direction:column;gap:8px}
+.finding{
+  border:1px solid var(--border);
+  border-radius:var(--r);
+  padding:12px 14px;
+  display:grid;
+  grid-template-columns:auto 1fr auto;
+  align-items:center;gap:12px;
+  transition:border-color .15s,background .15s;
+  cursor:default;
+}
+.finding:hover{border-color:rgba(0,0,0,.2);background:#fff}
+.risk-badge{
+  font-family:var(--mono);font-size:10px;font-weight:500;
+  padding:3px 8px;border-radius:3px;letter-spacing:.5px;text-transform:uppercase;
+  white-space:nowrap;
+}
+.risk-badge.critical{background:#fee2e2;color:#dc2626;border:1px solid #fca5a5}
+.risk-badge.high{background:#ffedd5;color:#c2410c;border:1px solid #fed7aa}
+.risk-badge.medium{background:#fef3c7;color:#b45309;border:1px solid #fde68a}
+.risk-badge.low{background:#dcfce7;color:#166534;border:1px solid #a7f3d0}
+
+.finding-id{
+  font-family:var(--mono);font-size:11px;color:var(--ink);
+  font-weight:500;
+}
+.finding-issues{font-size:11px;color:rgba(0,0,0,.45);margin-top:2px}
+.finding-pii{
+  font-family:var(--mono);font-size:10px;
+  background:rgba(220,38,38,.08);
+  color:#dc2626;padding:2px 6px;border-radius:2px;
+  white-space:nowrap;
+}
+
+/* ── COMPLIANCE SCORE ────────────────────────────────────────────────────── */
+.compliance-score-wrap{text-align:center;padding:8px 0 16px}
+.score-ring{margin:0 auto 12px}
+.score-num{
+  font-family:var(--head);font-size:52px;font-weight:800;
+  color:var(--ink);line-height:1;
+}
+.score-denom{font-family:var(--mono);font-size:16px;color:rgba(0,0,0,.3)}
+.score-label{font-size:12px;color:rgba(0,0,0,.45);margin-top:4px}
+.risk-pills{display:flex;justify-content:center;gap:8px;flex-wrap:wrap;margin-top:16px}
+.pill{
+  padding:5px 12px;border-radius:3px;
+  font-family:var(--mono);font-size:11px;font-weight:500;
+  display:flex;align-items:center;gap:5px;
+}
+.pill.crit{background:#fee2e2;color:#dc2626}
+.pill.high{background:#ffedd5;color:#c2410c}
+.pill.med{background:#fef3c7;color:#b45309}
+.pill.low2{background:#dcfce7;color:#166534}
+.pill-count{font-size:16px;font-weight:700}
+
+/* ── CULTURE ─────────────────────────────────────────────────────────────── */
+.maturity-bar-wrap{margin-bottom:20px}
+.maturity-track{
+  height:12px;background:rgba(0,0,0,.06);
+  border-radius:6px;overflow:hidden;margin:8px 0 4px;
+}
+.maturity-fill{
+  height:100%;border-radius:6px;
+  background:linear-gradient(90deg,var(--gold),#e8961a);
+  transition:width .8s cubic-bezier(.4,0,.2,1);
+}
+.maturity-labels{
+  display:flex;justify-content:space-between;
+  font-family:var(--mono);font-size:10px;color:rgba(0,0,0,.35);
+}
+.aspect-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:16px}
+.aspect{background:rgba(0,0,0,.03);border-radius:var(--r);padding:10px 12px}
+.aspect-name{font-size:11px;color:rgba(0,0,0,.5);margin-bottom:6px;text-transform:capitalize}
+.aspect-dots{display:flex;gap:3px}
+.aspect-dot{width:8px;height:8px;border-radius:2px;background:rgba(0,0,0,.08)}
+.aspect-dot.on{background:var(--gold)}
+.tags-list{display:flex;flex-wrap:wrap;gap:6px;margin-top:12px}
+.tag{
+  padding:4px 10px;background:rgba(0,0,0,.05);
+  border-radius:3px;font-size:11px;color:rgba(0,0,0,.6);
+}
+.tag.bottleneck{background:rgba(232,70,26,.08);color:var(--accent)}
+.tag.strength{background:rgba(26,140,78,.08);color:var(--ok)}
+
+/* ── CORRELATIONS ────────────────────────────────────────────────────────── */
+.correlations{display:flex;flex-direction:column;gap:12px}
+.correlation{
+  border-left:3px solid;
+  padding:12px 16px;
+  border-radius:0 var(--r) var(--r) 0;
+  background:rgba(0,0,0,.02);
+}
+.correlation.critical{border-color:var(--crit);background:rgba(220,38,38,.04)}
+.correlation.high{border-color:var(--high);background:rgba(232,92,26,.04)}
+.correlation.medium{border-color:var(--med);background:rgba(217,119,6,.04)}
+.correlation-title{font-weight:600;font-size:13px;margin-bottom:4px}
+.correlation-ev{font-size:12px;color:rgba(0,0,0,.5)}
+.domains-row{display:flex;gap:4px;margin-top:8px}
+.domain-chip{
+  font-family:var(--mono);font-size:10px;
+  padding:2px 7px;border-radius:2px;
+  background:rgba(0,0,0,.06);color:rgba(0,0,0,.5);
+  text-transform:uppercase;letter-spacing:.5px;
+}
+
+/* ── ACTIONS ─────────────────────────────────────────────────────────────── */
+.actions{display:flex;flex-direction:column;gap:8px}
+.action{
+  display:grid;grid-template-columns:auto 1fr;gap:12px;
+  align-items:start;padding:12px;
+  border:1px solid var(--border);border-radius:var(--r);
+  transition:background .15s;
+}
+.action:hover{background:#fff}
+.action-num{
+  font-family:var(--head);font-weight:800;font-size:18px;
+  color:rgba(0,0,0,.12);line-height:1.2;
+}
+.action-text{font-size:12px;line-height:1.5;color:rgba(0,0,0,.65)}
+.action-text strong{color:var(--ink);font-weight:600}
+
+/* ── EXECUTIVE SUMMARY ───────────────────────────────────────────────────── */
+.summary-box{
+  background:var(--ink);color:#fff;
+  border-radius:var(--r2);padding:32px;
+  font-size:14px;line-height:1.8;
+  position:relative;overflow:hidden;
+}
+.summary-box::before{
+  content:'"';
+  position:absolute;top:-20px;left:24px;
+  font-family:var(--head);font-size:140px;font-weight:800;
+  color:rgba(255,255,255,.04);line-height:1;pointer-events:none;
+}
+.summary-text{position:relative;z-index:1;color:rgba(255,255,255,.8)}
+.summary-meta{
+  margin-top:20px;padding-top:16px;
+  border-top:1px solid rgba(255,255,255,.08);
+  display:flex;gap:24px;flex-wrap:wrap;
+}
+.smeta{font-family:var(--mono);font-size:11px;color:rgba(255,255,255,.3)}
+.smeta strong{color:rgba(255,255,255,.6)}
+
+/* ── IDLE RESOURCES ──────────────────────────────────────────────────────── */
+.idle-list{display:flex;flex-direction:column;gap:8px}
+.idle-item{
+  display:grid;grid-template-columns:1fr auto auto;
+  align-items:center;gap:12px;
+  padding:10px 12px;
+  border:1px solid var(--border);border-radius:var(--r);
+}
+.idle-id{font-family:var(--mono);font-size:12px;font-weight:500}
+.idle-provider{
+  font-family:var(--mono);font-size:10px;text-transform:uppercase;
+  padding:2px 7px;border-radius:2px;background:rgba(0,0,0,.06);color:rgba(0,0,0,.5);
+}
+.idle-cost{
+  font-family:var(--head);font-size:15px;font-weight:700;
+  color:var(--crit);
+}
+
+/* ── LOADING / ERROR ─────────────────────────────────────────────────────── */
+.loading{
+  display:flex;flex-direction:column;align-items:center;justify-content:center;
+  height:60vh;gap:16px;color:rgba(0,0,0,.35);
+}
+.spinner{
+  width:36px;height:36px;border-radius:50%;
+  border:3px solid rgba(0,0,0,.08);
+  border-top-color:var(--accent);
+  animation:spin .7s linear infinite;
+}
+
+/* ── ANIMATIONS ──────────────────────────────────────────────────────────── */
+@keyframes fadeUp{
+  from{opacity:0;transform:translateY(12px)}
+  to{opacity:1;transform:translateY(0)}
+}
+@keyframes spin{to{transform:rotate(360deg)}}
+
+/* ── RESPONSIVE ──────────────────────────────────────────────────────────── */
+@media(max-width:1100px){
+  .hero-row{grid-template-columns:1fr 1fr;}.risk-card{grid-column:1/-1}
+  .content-grid.three{grid-template-columns:1fr 1fr}
+}
+@media(max-width:700px){
+  main{padding:20px 16px 48px}
+  header{padding:0 16px}
+  .hero-row,.content-grid,.content-grid.three{grid-template-columns:1fr}
+  .bar-row{grid-template-columns:80px 1fr 60px}
+}
+</style>
+</head>
+<body>
+<div class="app">
+
+<!-- HEADER -->
+<header>
+  <div class="logo">
+    <div class="logo-mark">
+      <svg viewBox="0 0 16 16"><path d="M8 2L14 5.5V10.5L8 14L2 10.5V5.5L8 2Z"/></svg>
+    </div>
+    Governance Intelligence Hub
+  </div>
+  <div class="header-meta">
+    <span class="exec-id" id="hdr-id">—</span>
+    <span class="header-badge" id="hdr-orch">—</span>
+    <span class="header-badge live">● LIVE</span>
+    <span id="hdr-ts">—</span>
+  </div>
+</header>
+
+<!-- MAIN -->
+<main id="app">
+  <div class="loading">
+    <div class="spinner"></div>
+    <span>Carregando relatório…</span>
+  </div>
+</main>
+
+</div>
+
+<script>
+// ── DEMO DATA (usado quando não há servidor HTTP) ──────────────────────────
+const DEMO = {
+  body: {
+    execution_id:"demo-0000",
+    generated_at:"2026-05-06T00:00:00Z",
+    orchestrator:"langgraph",
+    plan:{active_agents:["finops","data_governance","cultura"],priority:"critical"},
+    finops:{
+      total_cost:4980.70,
+      cost_by_provider:{aws:2405.55,gcp:744.40,azure:1830.75},
+      cost_by_service_type:{compute:1475.55,storage:1858.60,database:1646.55},
+      idle_resources:[
+        {resource_id:"i-123",provider:"aws",service_type:"compute",monthly_cost:820.45},
+        {resource_id:"vm-1",provider:"gcp",service_type:"compute",monthly_cost:430.10},
+        {resource_id:"vm-staging",provider:"azure",service_type:"compute",monthly_cost:180.00}
+      ],
+      idle_count:3,idle_cost:1430.55,
+      untagged_resources:["s3://clientes-dados","gs://analytics-temp","db-clientes"],
+      untagged_count:3,savings_potential:1430.55,total_resources:11
+    },
+    data_governance:{
+      compliance_score:46,
+      risk_summary:{critical:1,high:1,medium:2,low:2},
+      pii_exposure_count:4,
+      findings:[
+        {resource_id:"s3://clientes-dados",provider:"aws",risk_level:"critical",
+         issues:["recurso público com dados PII críticos","sem criptografia"],
+         pii_fields:["nome","cpf","email"]},
+        {resource_id:"gs://analytics-temp",provider:"gcp",risk_level:"high",
+         issues:["recurso público sem controle de acesso"],pii_fields:["session_id"]},
+        {resource_id:"db-prod",provider:"azure",risk_level:"medium",
+         issues:["sem controle de acesso"],pii_fields:[]},
+        {resource_id:"db-clientes",provider:"azure",risk_level:"medium",
+         issues:["sem controle de acesso"],pii_fields:["nome","telefone"]},
+        {resource_id:"s3://logs-aplicacao",provider:"aws",risk_level:"low",
+         issues:[],pii_fields:[]}
+      ]
+    },
+    cultura:{
+      culture_type:"Conservadora",maturity_score:3.5,max_score:10,
+      digital_readiness:"média",
+      traits:["Tomada de decisão centralizada","Gap TI-negócio","Ausência de ferramentas colaborativas"],
+      bottlenecks:["Aprovações em múltiplos níveis","TI como gargalo"],
+      strengths:["Abertura a metodologias ágeis","Consciência sobre mudança"],
+      aspect_scores:{decision_making:.2,it_business_alignment:.2,collaboration_tools:.2,innovation_culture:.2,agility:.2}
+    },
+    analysis:{
+      overall_risk_score:4.6,savings_opportunity:1430.55,total_critical_findings:1,
+      correlated_issues:[
+        {title:"Alto custo em recursos com violações LGPD críticas",severity:"critical",
+         domains:["finops","data_governance"],
+         evidence:"1 recurso(s) crítico(s) com custo total de $4,980. Exposição financeira e legal."},
+        {title:"Cultura burocrática retarda remediação de recursos ociosos",severity:"high",
+         domains:["cultura","finops"],
+         evidence:"Maturidade 3.5/10. 3 recursos ociosos mantidos por falta de processo ágil."},
+        {title:"Padrão sistêmico de governança imatura",severity:"medium",
+         domains:["finops","data_governance"],
+         evidence:"3 recursos sem tags + 3 sem controle de acesso."}
+      ],
+      priority_actions:[
+        "[CRÍTICO] s3://clientes-dados: Tornar privado IMEDIATAMENTE. Implementar RBAC e criptografia.",
+        "[ALTO] Descomissionar 3 recursos ociosos — economia de $1.430/mês",
+        "[MÉDIO] Aplicar tagueamento obrigatório (3 recursos sem tags)",
+        "[ESTRATÉGICO] Criar canal direto TI-negócio e reduzir cadeia de aprovação"
+      ],
+      executive_summary:"A análise integrada revela score de risco de 4.6/10, com 1 violação LGPD crítica envolvendo CPF exposto publicamente, $1.430/mês em recursos ociosos e cultura conservadora que amplifica a velocidade de resposta aos riscos identificados. Ação imediata requerida.",
+      llm_insights:[]
+    }
+  }
+};
+
+// ── DATA LOADING ───────────────────────────────────────────────────────────
+async function loadReport() {
+  try {
+    const r = await fetch('/api/report', {signal: AbortSignal.timeout(2000)});
+    if (r.ok) return await r.json();
+  } catch(_) {}
+  return DEMO;
+}
+
+// ── FORMATTERS ─────────────────────────────────────────────────────────────
+const fmt$ = v => '$' + v.toLocaleString('pt-BR', {minimumFractionDigits:2, maximumFractionDigits:2});
+const fmtN = v => v.toLocaleString('pt-BR');
+const escHtml = s => String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
+
+function riskColor(lvl) {
+  return {critical:'var(--crit)',high:'var(--high)',medium:'var(--med)',low:'var(--low)'}[lvl] || '#666';
+}
+
+// ── GAUGE SVG ──────────────────────────────────────────────────────────────
+function buildGauge(score, max=10) {
+  const R = 54, cx=70, cy=68;
+  const circumference = Math.PI * R; // half circle
+  const pct = Math.min(score / max, 1);
+  const dash = pct * circumference;
+  const color = score >= 7 ? '#ef4444' : score >= 5 ? '#f97316' : score >= 3 ? '#eab308' : '#22c55e';
+  return `
+  <svg class="gauge-svg" viewBox="0 0 140 75" width="140" height="75">
+    <path class="gauge-track" d="M16,68 A54,54 0 0,1 124,68" stroke="rgba(255,255,255,.1)" stroke-width="12" fill="none" stroke-linecap="round"/>
+    <path class="gauge-fill" d="M16,68 A54,54 0 0,1 124,68"
+      stroke="${color}" stroke-width="12" fill="none" stroke-linecap="round"
+      stroke-dasharray="${dash} ${circumference}"
+      style="transition:stroke-dasharray .9s cubic-bezier(.4,0,.2,1)"/>
+  </svg>`;
+}
+
+// ── DONUT SVG ──────────────────────────────────────────────────────────────
+function buildDonut(data, colors) {
+  const R=50, cx=60, cy=60, total=Object.values(data).reduce((a,b)=>a+b,0);
+  if(!total) return '';
+  let startAngle=-Math.PI/2, paths='';
+  const entries = Object.entries(data);
+  entries.forEach(([k,v],i)=>{
+    const angle=(v/total)*2*Math.PI;
+    const x1=cx+R*Math.cos(startAngle), y1=cy+R*Math.sin(startAngle);
+    const x2=cx+R*Math.cos(startAngle+angle), y2=cy+R*Math.sin(startAngle+angle);
+    const lg=angle>Math.PI?1:0;
+    paths+=`<path d="M${cx},${cy} L${x1.toFixed(2)},${y1.toFixed(2)} A${R},${R} 0 ${lg},1 ${x2.toFixed(2)},${y2.toFixed(2)} Z" fill="${colors[i%colors.length]}"/>`;
+    startAngle+=angle;
+  });
+  return `<svg viewBox="0 0 120 120" width="110" height="110">
+    <circle cx="60" cy="60" r="50" fill="none"/>
+    ${paths}
+    <circle cx="60" cy="60" r="28" fill="var(--panel)"/>
+  </svg>`;
+}
+
+// ── SCORE RING ──────────────────────────────────────────────────────────────
+function buildScoreRing(score, max=100) {
+  const R=44, cx=50, cy=50, circ=2*Math.PI*R;
+  const pct=score/max, dash=pct*circ;
+  const color=score>=70?'var(--ok)':score>=50?'var(--warn)':'var(--crit)';
+  return `<svg width="100" height="100" viewBox="0 0 100 100" class="score-ring">
+    <circle cx="${cx}" cy="${cy}" r="${R}" fill="none" stroke="rgba(0,0,0,.06)" stroke-width="8"/>
+    <circle cx="${cx}" cy="${cy}" r="${R}" fill="none" stroke="${color}" stroke-width="8"
+      stroke-linecap="round" stroke-dasharray="${dash.toFixed(2)} ${circ.toFixed(2)}"
+      transform="rotate(-90 ${cx} ${cy})"
+      style="transition:stroke-dasharray .9s cubic-bezier(.4,0,.2,1)"/>
+  </svg>`;
+}
+
+// ── RENDER ─────────────────────────────────────────────────────────────────
+function render(report) {
+  const b = report.body;
+  const fi = b.finops        || {};
+  const dg = b.data_governance || b.governance_result || {};
+  const cu = b.cultura       || {};
+  const an = b.analysis      || b.analyzer_result    || {};
+  const pl = b.plan          || b.execution_plan      || {};
+
+  // Header
+  document.getElementById('hdr-id').textContent = 'ID: ' + (b.execution_id||'—');
+  document.getElementById('hdr-orch').textContent = (b.orchestrator||pl.orchestrator||'langgraph').toUpperCase();
+  const ts = b.generated_at ? new Date(b.generated_at).toLocaleString('pt-BR') : '—';
+  document.getElementById('hdr-ts').textContent = ts;
+
+  const providers = fi.cost_by_provider || {};
+  const provTotal = Object.values(providers).reduce((a,b)=>a+b,0)||1;
+  const svcTypes  = fi.cost_by_service_type || {};
+  const svcTotal  = Object.values(svcTypes).reduce((a,b)=>a+b,0)||1;
+  const rs = dg.risk_summary || {};
+  const score = an.overall_risk_score || 0;
+  const findings = (dg.findings||[]).slice().sort((a,b)=>{
+    const o={critical:0,high:1,medium:2,low:3};
+    return (o[a.risk_level]||9)-(o[b.risk_level]||9);
+  });
+  const idles = fi.idle_resources || [];
+
+  document.getElementById('app').innerHTML = `
+
+<!-- ── HERO KPIs ── -->
+<div class="section-label" style="animation:fadeUp .3s ease both">Visão Executiva</div>
+<div class="hero-row">
+
+  <div class="kpi ${fi.total_cost>5000?'crit':fi.total_cost>3000?'warn':'ok'}" style="animation-delay:.05s">
+    <div class="kpi-label">Custo Total Mensal</div>
+    <div class="kpi-value"><sup>$</sup>${fmtN(Math.round(fi.total_cost||0))}</div>
+    <div class="kpi-sub">Potencial de economia: <strong>${fmt$(fi.savings_potential||0)}</strong></div>
+  </div>
+
+  <div class="kpi ${dg.compliance_score<50?'crit':dg.compliance_score<70?'warn':'ok'}" style="animation-delay:.1s">
+    <div class="kpi-label">Score LGPD</div>
+    <div class="kpi-value">${dg.compliance_score||0}<span style="font-size:18px;color:rgba(0,0,0,.3)">/100</span></div>
+    <div class="kpi-sub"><strong>${rs.critical||0}</strong> crítico · <strong>${rs.high||0}</strong> alto · <strong>${rs.medium||0}</strong> médio</div>
+  </div>
+
+  <div class="kpi ${cu.maturity_score<4?'crit':cu.maturity_score<6?'warn':'ok'}" style="animation-delay:.15s">
+    <div class="kpi-label">Maturidade Digital</div>
+    <div class="kpi-value">${(cu.maturity_score||0).toFixed(1)}<span style="font-size:18px;color:rgba(0,0,0,.3)">/10</span></div>
+    <div class="kpi-sub">Cultura: <strong>${cu.culture_type||'—'}</strong> · ${cu.digital_readiness||'—'}</div>
+  </div>
+
+  <div class="risk-card" style="animation-delay:.2s">
+    <div class="risk-label">Score de Risco Global</div>
+    <div class="gauge-wrap">
+      ${buildGauge(score)}
+      <div class="gauge-score">${score.toFixed(1)}<span class="gauge-max">/10</span></div>
+    </div>
+    <div class="risk-desc">${score>=7?'🔴 Risco elevado':score>=5?'🟠 Atenção requerida':score>=3?'🟡 Risco moderado':'🟢 Sob controle'}</div>
+  </div>
+
+</div>
+
+<!-- ── FINOPS ── -->
+<div class="section-label" style="animation:fadeUp .35s ease both">FinOps · Análise de Custos</div>
+<div class="content-grid three" style="margin-bottom:16px">
+
+  <div class="panel" style="animation-delay:.1s">
+    <div class="panel-title"><div class="dot"></div>Custo por Provider</div>
+    <div class="bar-chart">
+      ${Object.entries(providers).map(([p,v])=>`
+      <div class="bar-row">
+        <div class="bar-name">${p.toUpperCase()}</div>
+        <div class="bar-track"><div class="bar-fill ${p}" style="width:${(v/provTotal*100).toFixed(1)}%"></div></div>
+        <div class="bar-val">${fmt$(v)}</div>
+      </div>`).join('')}
+    </div>
+  </div>
+
+  <div class="panel" style="animation-delay:.15s">
+    <div class="panel-title"><div class="dot accent2"></div>Custo por Serviço</div>
+    <div class="bar-chart">
+      ${Object.entries(svcTypes).map(([s,v])=>`
+      <div class="bar-row">
+        <div class="bar-name">${s}</div>
+        <div class="bar-track"><div class="bar-fill ${s}" style="width:${(v/svcTotal*100).toFixed(1)}%"></div></div>
+        <div class="bar-val">${fmt$(v)}</div>
+      </div>`).join('')}
+    </div>
+  </div>
+
+  <div class="panel" style="animation-delay:.2s">
+    <div class="panel-title"><div class="dot crit"></div>Recursos Ociosos (${idles.length})</div>
+    <div class="idle-list">
+      ${idles.map(r=>`
+      <div class="idle-item">
+        <div>
+          <div class="idle-id">${escHtml(r.resource_id)}</div>
+          <div style="font-size:10px;color:rgba(0,0,0,.4);font-family:var(--mono);margin-top:2px">${r.service_type}</div>
+        </div>
+        <div class="idle-provider">${r.provider}</div>
+        <div class="idle-cost">${fmt$(r.monthly_cost)}</div>
+      </div>`).join('')}
+      <div style="text-align:right;font-family:var(--mono);font-size:12px;color:var(--crit);margin-top:4px;font-weight:600">
+        Total: ${fmt$(fi.idle_cost||0)}/mês
+      </div>
+    </div>
+  </div>
+
+</div>
+
+<!-- ── PROVIDER DONUT ── -->
+<div class="content-grid" style="margin-bottom:16px">
+  <div class="panel" style="animation-delay:.2s">
+    <div class="panel-title"><div class="dot gold"></div>Distribuição de Custos Cloud</div>
+    <div class="donut-wrap">
+      ${buildDonut(providers,['#e8521a','#1a46e8','#1a8ce8'])}
+      <div class="donut-legend">
+        ${Object.entries(providers).map(([p,v],i)=>`
+        <div class="legend-item">
+          <div class="legend-dot" style="background:${['#e8521a','#1a46e8','#1a8ce8'][i%3]}"></div>
+          <span class="legend-label">${p.toUpperCase()}</span>
+          <span class="legend-val">${((v/provTotal)*100).toFixed(0)}%</span>
+        </div>`).join('')}
+        <div style="margin-top:12px;font-family:var(--mono);font-size:11px;color:rgba(0,0,0,.4)">
+          ${fmtN(fi.total_resources||0)} recursos · ${fi.untagged_count||0} sem tags
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="panel" style="animation-delay:.25s">
+    <div class="panel-title"><div class="dot crit"></div>Compliance LGPD</div>
+    <div class="compliance-score-wrap">
+      ${buildScoreRing(dg.compliance_score||0)}
+      <div class="score-num">${dg.compliance_score||0}<span class="score-denom">/100</span></div>
+      <div class="score-label">${dg.pii_exposure_count||0} recurso(s) com PII exposto</div>
+    </div>
+    <div class="risk-pills">
+      <div class="pill crit"><span class="pill-count">${rs.critical||0}</span> Crítico</div>
+      <div class="pill high"><span class="pill-count">${rs.high||0}</span> Alto</div>
+      <div class="pill med"><span class="pill-count">${rs.medium||0}</span> Médio</div>
+      <div class="pill low2"><span class="pill-count">${rs.low||0}</span> Baixo</div>
+    </div>
+  </div>
+</div>
+
+<!-- ── FINDINGS ── -->
+<div class="section-label" style="animation:fadeUp .4s ease both">Governança de Dados · Findings LGPD</div>
+<div class="panel content-grid one" style="margin-bottom:32px;animation-delay:.1s">
+  <div class="findings">
+    ${findings.map(f=>`
+    <div class="finding">
+      <span class="risk-badge ${f.risk_level}">${f.risk_level}</span>
+      <div>
+        <div class="finding-id">${escHtml(f.resource_id)}</div>
+        <div class="finding-issues">${f.issues.slice(0,2).map(escHtml).join(' · ')}</div>
+      </div>
+      ${f.pii_fields&&f.pii_fields.length?`<span class="finding-pii">${f.pii_fields.slice(0,3).join(', ')}</span>`:'<span></span>'}
+    </div>`).join('')}
+  </div>
+</div>
+
+<!-- ── CULTURA ── -->
+<div class="section-label" style="animation:fadeUp .4s ease both">Cultura Organizacional</div>
+<div class="content-grid" style="margin-bottom:32px">
+  <div class="panel" style="animation-delay:.1s">
+    <div class="panel-title"><div class="dot gold"></div>Maturidade Digital</div>
+    <div class="maturity-bar-wrap">
+      <div style="display:flex;justify-content:space-between;align-items:baseline">
+        <span style="font-family:var(--head);font-weight:700;font-size:28px">${(cu.maturity_score||0).toFixed(1)}</span>
+        <span style="font-family:var(--mono);font-size:11px;color:rgba(0,0,0,.4)">de ${cu.max_score||10}</span>
+      </div>
+      <div class="maturity-track">
+        <div class="maturity-fill" style="width:${((cu.maturity_score||0)/(cu.max_score||10)*100).toFixed(0)}%"></div>
+      </div>
+      <div class="maturity-labels"><span>Inicial</span><span>Básico</span><span>Intermediário</span><span>Avançado</span><span>Líder</span></div>
+    </div>
+    <div style="font-size:12px;color:rgba(0,0,0,.5);margin-top:4px">
+      Digital readiness: <strong style="color:var(--ink)">${cu.digital_readiness||'—'}</strong>
+    </div>
+    <div class="aspect-grid">
+      ${Object.entries(cu.aspect_scores||{}).map(([k,v])=>`
+      <div class="aspect">
+        <div class="aspect-name">${k.replace(/_/g,' ')}</div>
+        <div class="aspect-dots">
+          ${[1,2,3,4,5].map(i=>`<div class="aspect-dot ${v>=(i*0.2-0.1)?'on':''}"></div>`).join('')}
+        </div>
+      </div>`).join('')}
+    </div>
+  </div>
+
+  <div class="panel" style="animation-delay:.15s">
+    <div class="panel-title"><div class="dot accent2"></div>${cu.culture_type||'Cultura'}</div>
+    <div style="font-size:12px;color:rgba(0,0,0,.5);margin-bottom:12px">Gargalos identificados</div>
+    <div class="tags-list">
+      ${(cu.bottlenecks||[]).map(b=>`<div class="tag bottleneck">↯ ${escHtml(b)}</div>`).join('')}
+    </div>
+    <div style="font-size:12px;color:rgba(0,0,0,.5);margin:16px 0 8px">Pontos fortes</div>
+    <div class="tags-list">
+      ${(cu.strengths||[]).map(s=>`<div class="tag strength">✓ ${escHtml(s)}</div>`).join('')}
+    </div>
+    <div style="font-size:12px;color:rgba(0,0,0,.5);margin:16px 0 8px">Traços dominantes</div>
+    <div class="tags-list">
+      ${(cu.traits||[]).map(t=>`<div class="tag">${escHtml(t)}</div>`).join('')}
+    </div>
+  </div>
+</div>
+
+<!-- ── CORRELAÇÕES ── -->
+<div class="section-label" style="animation:fadeUp .4s ease both">Correlações Cross-Domain</div>
+<div class="content-grid" style="margin-bottom:32px">
+  <div class="panel" style="animation-delay:.1s">
+    <div class="panel-title"><div class="dot crit"></div>Riscos Correlacionados</div>
+    <div class="correlations">
+      ${(an.correlated_issues||[]).map(c=>`
+      <div class="correlation ${c.severity}">
+        <div class="correlation-title">${escHtml(c.title)}</div>
+        <div class="correlation-ev">${escHtml(c.evidence)}</div>
+        <div class="domains-row">
+          ${(c.domains||[]).map(d=>`<span class="domain-chip">${d}</span>`).join('')}
+        </div>
+      </div>`).join('')}
+    </div>
+  </div>
+
+  <div class="panel" style="animation-delay:.15s">
+    <div class="panel-title"><div class="dot ok"></div>Ações Prioritárias</div>
+    <div class="actions">
+      ${(an.priority_actions||[]).map((a,i)=>`
+      <div class="action">
+        <div class="action-num">0${i+1}</div>
+        <div class="action-text">${escHtml(a)}</div>
+      </div>`).join('')}
+    </div>
+  </div>
+</div>
+
+<!-- ── SUMÁRIO EXECUTIVO ── -->
+<div class="section-label" style="animation:fadeUp .4s ease both">Sumário Executivo</div>
+<div class="summary-box" style="animation:fadeUp .5s .1s ease both;margin-bottom:48px">
+  <div class="summary-text">${escHtml(an.executive_summary||'Sem sumário disponível.')}</div>
+  <div class="summary-meta">
+    <span class="smeta">Execução <strong>${escHtml(b.execution_id||'—')}</strong></span>
+    <span class="smeta">Gerado em <strong>${ts}</strong></span>
+    <span class="smeta">Orquestrador <strong>${escHtml(b.orchestrator||'—')}</strong></span>
+    <span class="smeta">Domínios <strong>${(an.domains_analyzed||[]).join(', ')||'—'}</strong></span>
+  </div>
+</div>
+`;
+}
+
+// ── BOOT ───────────────────────────────────────────────────────────────────
+loadReport().then(render);
+</script>
+</body>
+</html>

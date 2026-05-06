@@ -32,7 +32,8 @@ import argparse
 import sys
 import time
 from uuid import uuid4
-
+from view.dashboard import main as start_dashboard
+import threading
 from config import (
     INPUT_FILE,
     LLM_PROVIDER,
@@ -49,6 +50,11 @@ from storage.report_writer import persist_report, print_summary
 
 setup_logging()
 log = get_logger("main")
+
+
+def run_dashboard():
+    sys.argv = ["dashboard"]
+    start_dashboard()
 
 
 def parse_args() -> argparse.Namespace:
@@ -235,6 +241,9 @@ def main() -> int:
     print(
         f"\nConcluído em {elapsed:.2f}s  |  Orquestrador: {orchestrator}  |  ID: {execution_id}\n"
     )
+
+    run_dashboard()
+
     return 0
 
 
