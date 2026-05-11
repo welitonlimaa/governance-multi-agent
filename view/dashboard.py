@@ -79,8 +79,8 @@ def main():
     args = parser.parse_args()
 
     url = f"http://localhost:{args.port}"
-    print(f"\n🌐  Dashboard disponível em: {url}")
-    print(f"📊  Relatório via API:        {url}/api/report")
+    print(f"\nDashboard disponível em: {url}")
+    print(f"Relatório via API:        {url}/api/report")
     print("     Ctrl+C para encerrar\n")
 
     server = HTTPServer(("localhost", args.port), DashboardHandler)
@@ -89,7 +89,7 @@ def main():
     try:
         server.serve_forever()
     except KeyboardInterrupt:
-        print("\n👋  Dashboard encerrado.")
+        print("\nDashboard encerrado.")
 
 
 if __name__ == "__main__":
