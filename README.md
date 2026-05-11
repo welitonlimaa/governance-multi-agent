@@ -42,7 +42,7 @@ O sistema processa dados estruturados de recursos cloud e documentos organizacio
 | **LangGraph** | Orquestra o fluxo com paralelismo e roteamento condicional |
 | **S3 Simulado** | Persiste relatórios em disco como `storage/reports/` |
 
-> **Regra fundamental:** Agentes processam dados. LLM interpreta dados. O LLM nunca calcula valores nem classifica riscos — isso é responsabilidade dos agentes.
+> **Regra fundamental:** Agentes processam dados. LLM interpreta dados. O LLM nunca calcula valores nem classifica riscos, isso é responsabilidade dos agentes.
 
 ---
 
@@ -73,7 +73,7 @@ Todos os agentes recebem e retornam dados através de um envelope padronizado:
 ## Estrutura de Pastas
 
 ```
-multi_agent_gov/
+governance-multi-agent/
 │
 ├── main.py                         # Entrypoint principal
 ├── config.py                       # Variáveis de ambiente centralizadas
@@ -111,7 +111,7 @@ multi_agent_gov/
 │   └── context.py                  # MCPContext + MCPResponse
 │
 ├── parser/
-│   └── md_parser.py                # Extrai JSON e Markdown do arquivo .md
+│   └── md_parser.py                # Extrai dados do arquivo .md
 │
 ├── rag/
 │   ├── embedder.py                 # Embeddings locais (sentence-transformers)
@@ -220,43 +220,76 @@ ORCHESTRATOR=langgraph
 ### Saída esperada no console
 
 ```
-╔══════════════════════════════════════════════════════════════╗
-║       SISTEMA MULTI-AGENT DE GOVERNANÇA CLOUD                ║
-╚══════════════════════════════════════════════════════════════╝
-  Execução ID : a1b2c3d4
-  LLM         : 🔴 openai
-  AWS         : 🟡 mock
-  GCP         : 🟡 mock
-  Azure       : 🟡 mock
-
-⚙️   Inicializando cloud providers...
-    ✓ 3 provider(s) ativo(s): aws, gcp, azure
-
-🔗  Executando fluxo LangGraph...
-    Planner -> [FinOps ∥ DataGovernance ∥ Cultura] -> Analyzer
-
-💾  Relatório salvo em: s3://governance-reports/reports/a1b2c3d4.json
-
 ════════════════════════════════════════════════════════════
   RELATÓRIO EXECUTIVO — GOVERNANÇA MULTI-CLOUD
 ════════════════════════════════════════════════════════════
 
-💰 FINOPS
+---> AGENTES EXECUTADOS: finops, data_governance, cultura
+   Prioridade: CRITICAL
+
+────────────────────────────────────────────────────────────
+*** FINOPS
    Custo total mensal:    $  4,980.70
    Potencial de economia: $  1,430.55
-   ...
+   Recursos ociosos:      3 recurso(s)
+   Sem tags:              3 recurso(s)
 
-🔒 GOVERNANÇA DE DADOS (LGPD)
+   Custo por provider:
+     AWS      $  2,405.55
+     GCP      $    744.40
+     AZURE    $  1,830.75
+
+   Recursos ociosos:
+     • i-123 (aws) — $820.45/mês
+     • vm-1 (gcp) — $430.10/mês
+     • vm-staging (azure) — $180.00/mês
+
+────────────────────────────────────────────────────────────
+*** GOVERNANÇA DE DADOS (LGPD)
    Score de conformidade: 46/100
-   ...
+   Exposição de PII:      4 recurso(s)
+   Distribuição de riscos:
+     🔴 Crítico: 1
+     🟠 Alto:    1
+     🟡 Médio:   2
+     🟢 Baixo:   3
 
-🏢 CULTURA ORGANIZACIONAL
-   Tipo: Conservadora | Maturidade: 3.5/10
-   ...
+   Findings:
+     ...
+────────────────────────────────────────────────────────────
+*** CULTURA ORGANIZACIONAL
+   Tipo:              Conservadora
+   Maturidade digital: 3.5/10
+   Readiness digital:  média
 
-🎯 ANÁLISE CONSOLIDADA
-   Score de risco global: 4.6/10
-   ...
+   Traços identificados:
+     ...
+
+   Gargalos:
+     ...
+
+────────────────────────────────────────────────────────────
+!!! ANÁLISE CONSOLIDADA
+   Score de risco global:   4.6/10
+   Correlações detectadas:  3
+
+   Correlações:
+     ...
+
+   Ações prioritárias:
+     ...
+
+   Sumário executivo:
+     ...
+
+════════════════════════════════════════════════════════════
+
+
+Concluído em 23.94s  |  Orquestrador: langgraph  |  ID: 371c6f4a
+
+
+Dashboard disponível em: http://localhost:8080
+Relatório via API:        http://localhost:8080/api/report
 ```
 
 ---
@@ -501,7 +534,7 @@ O `CulturaAgent` usa RAG para contextualizar a análise nos documentos reais da 
 4. Durante análise, queries semânticas recuperam chunks relevantes
 5. Chunks recuperados enriquecem o contexto do agente
 
-**Fallback gracioso:** se o modelo de embeddings não puder ser baixado (sem internet ou domínio bloqueado), o agente continua funcionando com keyword matching — sem interromper o fluxo.
+**Fallback:** se o modelo de embeddings não puder ser baixado (sem internet ou domínio bloqueado), o agente continua funcionando com keyword matching sem interromper o fluxo.
 
 **Reutilização do índice:** se o índice FAISS já existir em disco, ele é carregado sem re-indexar. Para forçar reindexação, remova `storage/vector_db/`.
 
